@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CC Checker - Mehmet Ağaç</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0c29; /* Koyu arka plan */
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 30px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+    h1 { font-size: 2rem; margin-bottom: 10px; color: #00ff88; }
+    input {
+      width: 100%;
+      padding: 15px;
+      margin: 15px 0;
+      border: 2px solid #444;
+      border-radius: 10px;
+      background: #222;
+      color: #fff;
+      font-size: 1.1rem;
+      text-align: center;
+    }
+    input:focus { border-color: #00ff88; outline: none; }
+    button {
+      width: 100%;
+      padding: 15px;
+      background: #00ff88;
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover { background: #00cc70; transform: scale(1.02); }
+    .result { margin-top: 20px; font-size: 1.2rem; font-weight: bold; }
+    .valid { color: #00ff88; }
+    .invalid { color: #ff4444; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>CC Checker</h1>
+    <p>Kredi kartı numarasını gir, geçerliliğini kontrol et!</p>
+    
+    <input type="text" id="cc" placeholder="1234 5678 9012 3456" maxlength="19" />
+    <button onclick="checkCC()">Kontrol Et</button>
+    
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    // Sadece rakam ve boşluk bırak
+    document.getElementById('cc').addEventListener('input', function(e) {
+      let v = e.target.value.replace(/\D/g, '');
+      v = v.replace(/(\d{4})(?=\d)/g, '$1 ');
+      e.target.value = v.trim();
+    });
+
+    function luhnCheck(cardNumber) {
+      const digits = cardNumber.replace(/\D/g, '').split('').map(Number);
+      let sum = 0;
+      let isEven = false;
+      for (let i = digits.length - 1; i >= 0; i--) {
+        let digit = digits[i];
+        if (isEven) {
+          digit *= 2;
+          if (digit > 9) digit -= 9;
+        }
+        sum += digit;
+        isEven = !isEven;
+      }
+      return sum % 10 === 0;
+    }
+
+    function checkCC() {
+      const input = document.getElementById('cc').value;
+      const result = document.getElementById('result');
+      
+      if (!input.trim()) {
+        result.innerHTML = '<span class="invalid">Kart numarası gir!</span>';
+        return;
+      }
+      
+      const isValid = luhnCheck(input);
+      result.innerHTML = isValid 
+        ? '<span class="valid">✅ Geçerli Kart!</span>'
+        : '<span class="invalid">❌ Geçersiz Kart!</span>';
+    }
+  </script>
+</body>
+</html>
